@@ -36,15 +36,15 @@ export class GameViewModel {
     bind() {
         this.gameConfig = {
     type: Phaser.AUTO,
-    backgroundColor: '#2c3e50', // 1. 引擎背景色
+    backgroundColor: '#2c3e50', // 1. 确保游戏画布背景色
     scale: {
-        mode: Phaser.Scale.FIT, // 2. 自动缩放填充
-        autoCenter: Phaser.Scale.CENTER_BOTH, // 3. 居中
+        mode: Phaser.Scale.FIT, // 2. 自动缩放以适应屏幕
+        autoCenter: Phaser.Scale.CENTER_BOTH, // 3. 游戏画面始终居中
         width: 800, 
         height: 600,
-        orientation: Phaser.Scale.LANDSCAPE // 4. 锁定横屏方向
+        orientation: Phaser.Scale.LANDSCAPE // 4. 强制横屏逻辑
     },
-    // ... 其他配置
+    // ... 原有的 scene 等其他配置
 };
     // Chat:
 
