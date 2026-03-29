@@ -10,108 +10,134 @@
             background: #111;
             color: #eee;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: auto !important; 
-            height: auto !important;
-            margin: 0;
-            padding: 20px;
         }
 
         .input {
             display: flex;
-            margin-bottom: 8px;
-            align-items: center;
+            margin-bottom: 5px;
         }
 
         .input label {
-            width: 200px;
-            font-size: 0.9em;
-            color: #ccc;
+            width: 180px;
         }
 
         .input label + * {
             box-sizing: border-box;
-            max-width: 350px;
+            max-width: 300px;
         }
 
-        .input input[type=text], 
-        .input input[type=number], 
-        textarea {
+        .input input[type=text], .input input[type=number], textarea {
             flex: 1 1 100%;
             min-width: 0;
-            background: #222;
-            border: 1px solid #444;
-            color: #fff;
-            padding: 6px;
+            width: auto;
         }
 
-        .config-section {
-            border: 1px solid #333;
-            padding: 20px;
-            margin-bottom: 25px;
-            border-radius: 8px;
-            background: #1a1a1a;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        .main-flex-container {
+        .column {
             display: flex;
-            flex-wrap: wrap;
-            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .input > div {
+            display: flex;
         }
 
         pre {
             max-width: 100%;
             overflow-x: auto;
-            background: #000;
-            padding: 15px;
-            border: 1px solid #333;
-            color: #00ff00;
-            font-size: 0.85em;
         }
-
-        h1, h2 { border-bottom: 1px solid #333; padding-bottom: 10px; }
-        button { cursor: pointer; padding: 6px 12px; transition: 0.2s; }
-        .btn-main { background: #0078d4; color: white; border: none; padding: 12px 24px; font-weight: bold; }
-        .hint { font-size: 0.8em; color: #888; display: block; margin-top: 4px; }
     </style>
 
-    <div class="main-flex-container">
-        <div style="margin-right: 30px; flex: 1 1 650px;">
+    <div style="display: flex;">
+        <div style="margin-right: 20px;">
             <h1>Cyberball Configuration Builder</h1>
 
-            <div class="config-section">
-                <h2>Player (Subject)</h2>
-                <div class="input">
-                    <label>Name</label>
-                    <input type="text" value.bind="settings.player.name" />
-                </div>
-                <div class="input">
-                    <label>Tint Color</label>
-                    <input type="color" value.bind="settings.player.tint" />
-                </div>
-                <div class="input">
-                    <label>Portrait URL</label>
-                    <input type="text" value.bind="settings.player.portrait" />
-                </div>
+            <h2>Player</h2>
 
-                <div style="margin: 15px 0 5px 0; font-weight: bold;">Leave Triggers (Player)</div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-                    <label><input type="checkbox" checked.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:1" /> Throws Elapsed</label>
-                    <label><input type="checkbox" checked.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:4" /> Throws Ignored</label>
-                </div>
+            <div class="input">
+                <label>Name</label>
+                <input type="text" value.bind="settings.player.name" />
             </div>
 
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <h2>Computer Players (CPUs)</h2>
+            <div class="input">
+                <label>Tint Color</label>
+                <input type="color" value.bind="settings.player.tint" />
+            </div>
+
+            <div class="input">
+                <label>Portrait</label>
+                <input type="text" value.bind="settings.player.portrait" />
+            </div>
+
+            <div>Leave Triggers</div>
+            <div class="column">
+                <label>
+                    <input type="checkbox" checked.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:1" /> Throws Elapsed
+                </label>
+                <label>
+                    <input type="checkbox" checked.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:2" /> Time Elapsed
+                </label>
+                <label>
+                    <input type="checkbox" checked.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:4" /> Throws Ignored
+                </label>
+                <label>
+                    <input type="checkbox" checked.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:16" /> Time Ignored
+                </label>
+                <label>
+                    <input type="checkbox" checked.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:8" /> Other Players Leaving
+                </label>
+            </div>
+
+            <div class="column" if.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:1">
+                <label>Throws Elapsed Leave Threshold/Variance</label>
+
                 <div>
-                    <button click.delegate="addCPU()">+ Add CPU</button>
-                    <button click.delegate="removeCPU()">- Remove</button>
+                    <input type="number" value.bind="settings.player.leaveTurn | integer" />
+                    <input type="number" value.bind="settings.player.leaveTurnVariance | integer" />
                 </div>
             </div>
 
-            <div repeat.for="cpu of settings.computerPlayers" class="config-section" style="border-left: 4px solid #0078d4;">
-                <h3 style="margin-top:0; color: #0078d4;">CPU #${$index + 1}: ${cpu.name}</h3>
-                
+            <div class="column" if.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:2">
+                <label>Time Elapsed Leave Threshold/Variance</label>
+
+                <div>
+                    <input type="number" value.bind="settings.player.leaveTime | integer" />
+                    <input type="number" value.bind="settings.player.leaveTimeVariance | integer" />
+                </div>
+            </div>
+
+            <div class="column" if.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:4">
+                <label>Ignored Throws Leave Threshold/Variance</label>
+
+                <div>
+                    <input type="number" value.bind="settings.player.leaveIgnored | integer" />
+                    <input type="number" value.bind="settings.player.leaveIgnoredVariance | integer" />
+                </div>
+            </div>
+
+            <div class="column" if.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:16">
+                <label>Ignored Time Leave Threshold/Variance</label>
+
+                <div>
+                    <input type="number" value.bind="settings.player.leaveTimeIgnored | integer" />
+                    <input type="number" value.bind="settings.player.leaveTimeIgnoredVariance | integer" />
+                </div>
+            </div>
+
+            <div class="column" if.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:8">
+                <label>Others Left Leave Threshold</label>
+
+                <div>
+                    <input type="number" value.bind="settings.player.leaveOtherLeaver | integer" />
+                </div>
+            </div>
+
+            <h2>
+                CPUs
+                <button click.delegate="addCPU()">+ Add CPU</button>
+                <button click.delegate="removeCPU()">- Remove CPU</button>
+            </h2>
+
+            <div repeat.for="cpu of settings.computerPlayers">
                 <div class="input">
                     <label>Name</label>
                     <input type="text" value.bind="cpu.name" />
@@ -123,91 +149,193 @@
                 </div>
 
                 <div class="input">
-                    <label>Portrait URL</label>
+                    <label>Portrait</label>
                     <input type="text" value.bind="cpu.portrait" />
                 </div>
 
                 <div class="input">
-                    <label title="0: 玩家, 1+: 其他CPU">Target Preference (Weights)</label>
-                    <div style="display: flex; gap: 5px;">
-                        <input repeat.for="target of cpu.targetPreference" 
-                               type="number" 
-                               style="width: 55px;" 
-                               value.bind="cpu.targetPreference[$index] | integer" />
+                    <label>Throw Delay</label>
+                    <input type="number" value.bind="cpu.throwDelay | integer" />
+                </div>
+
+                <div class="input">
+                    <label>Throw Delay Variance</label>
+                    <input type="number" value.bind="cpu.throwDelayVariance | integer" />
+                </div>
+
+                <div class="input">
+                    <label>Catch Delay</label>
+                    <input type="number" value.bind="cpu.catchDelay | integer" />
+                </div>
+
+                <div class="input">
+                    <label>Catch Delay Variance</label>
+                    <input type="number" value.bind="cpu.catchDelayVariance | integer" />
+                </div>
+
+
+                <div class="input">
+                    <label>Target Preference</label>
+
+                    <div>
+                        <input repeat.for="target of cpu.targetPreference" type="number" value.bind="cpu.targetPreference[$index] | integer" />
                     </div>
                 </div>
 
-                <div style="margin-top:10px; border-top: 1px solid #333; padding-top:10px;">
-                    <span class="hint">Delays (ms) & Variances</span>
-                    <div class="input">
-                        <label>Catch Delay / Var</label>
-                        <div style="display: flex; gap: 5px;">
-                            <input type="number" value.bind="cpu.catchDelay | integer" />
-                            <input type="number" value.bind="cpu.catchDelayVariance | integer" />
-                        </div>
-                    </div>
-                    <div class="input">
-                        <label>Throw Delay / Var</label>
-                        <div style="display: flex; gap: 5px;">
-                            <input type="number" value.bind="cpu.throwDelay | integer" />
-                            <input type="number" value.bind="cpu.throwDelayVariance | integer" />
-                        </div>
+                <div>Leave Triggers</div>
+                <div class="column">
+                    <label>
+                        <input type="checkbox" checked.bind="cpu.leaveTrigger | flag:cpu.leaveTrigger:1" /> Throws Elapsed
+                    </label>
+                    <label>
+                        <input type="checkbox" checked.bind="cpu.leaveTrigger | flag:cpu.leaveTrigger:2" /> Time Elapsed
+                    </label>
+                    <label>
+                        <input type="checkbox" checked.bind="cpu.leaveTrigger | flag:cpu.leaveTrigger:4" /> Throws Ignored
+                    </label>
+                    <label>
+                        <input type="checkbox" checked.bind="cpu.leaveTrigger | flag:cpu.leaveTrigger:16" /> Time Ignored
+                    </label>
+                    <label>
+                        <input type="checkbox" checked.bind="cpu.leaveTrigger | flag:cpu.leaveTrigger:8" /> Other Players Leaving
+                    </label>
+                </div>
+
+                <div class="column" if.bind="cpu.leaveTrigger | flag:cpu.leaveTrigger:1">
+                    <label>Throws Elapsed Leave Threshold/Variance/Chance</label>
+
+                    <div>
+                        <input type="number" value.bind="cpu.leaveTurn | integer" />
+                        <input type="number" value.bind="cpu.leaveTurnVariance | integer" />
+                        <input type="number" value.bind="cpu.leaveTurnChance | integer" />
                     </div>
                 </div>
+
+                <div class="column" if.bind="cpu.leaveTrigger | flag:cpu.leaveTrigger:2">
+                    <label>Time Elapsed Leave Threshold/Variance/Chance</label>
+
+                    <div>
+                        <input type="number" value.bind="cpu.leaveTime | integer" />
+                        <input type="number" value.bind="cpu.leaveTimeVariance | integer" />
+                        <input type="number" value.bind="cpu.leaveTimeChance | integer" />
+                    </div>
+                </div>
+
+                <div class="column" if.bind="cpu.leaveTrigger | flag:cpu.leaveTrigger:4">
+                    <label>Ignored Throws Leave Threshold/Variance/Chance</label>
+
+                    <div>
+                        <input type="number" value.bind="cpu.leaveIgnored | integer" />
+                        <input type="number" value.bind="cpu.leaveIgnoredVariance | integer" />
+                        <input type="number" value.bind="cpu.leaveIgnoredChance | integer" />
+                    </div>
+                </div>
+
+                <div class="column" if.bind="cpu.leaveTrigger | flag:cpu.leaveTrigger:16">
+                    <label>Ignored Time Leave Threshold/Variance/Chance</label>
+
+                    <div>
+                        <input type="number" value.bind="cpu.leaveTimeIgnored | integer" />
+                        <input type="number" value.bind="cpu.leaveTimeIgnoredVariance | integer" />
+                        <input type="number" value.bind="cpu.leaveTimeIgnoredChance | integer" />
+                    </div>
+                </div>
+
+                <div class="column" if.bind="cpu.leaveTrigger | flag:cpu.leaveTrigger:8">
+                    <label>Others Left Leave Threshold/Chance</label>
+
+                    <div>
+                        <input type="number" value.bind="cpu.leaveOtherLeaver | integer" />
+                        <input type="number" value.bind="cpu.leaveOtherLeaverChance | integer" />
+                    </div>
+                </div>
+
+                <hr />
             </div>
 
-            <div class="config-section">
-                <h2>Global Gameplay</h2>
-                <div class="input">
-                    <label>Total Throws</label>
-                    <input type="number" value.bind="settings.throwCount | integer" />
-                </div>
-                <div class="input">
-                    <label>Ball Speed / Tint</label>
-                    <div style="display: flex; gap: 5px; flex-grow: 1;">
-                        <input type="number" value.bind="settings.ballSpeed | integer" placeholder="Speed" />
-                        <input type="color" value.bind="settings.ballTint" style="width: 60px;" />
-                    </div>
-                </div>
-                <div class="input">
-                    <label>Use Schedule</label>
-                    <input type="checkbox" checked.bind="settings.useSchedule" />
-                </div>
-                <div class="input" if.bind="settings.useSchedule">
-                    <label>Schedule Honors Throw Count</label>
-                    <input type="checkbox" checked.bind="settings.scheduleHonorsThrowCount" />
-                </div>
-                <div class="input" if.bind="settings.useSchedule">
-                    <label>Schedule (0=Player, 1=C1...)</label>
-                    <textarea value.bind="settings.schedule | integerArray & updateTrigger:'blur'"></textarea>
-                </div>
-                <div class="input">
-                    <label>Game Over Text</label>
-                    <input type="text" value.bind="settings.gameOverText" />
-                </div>
+            <h2>Gameplay</h2>
+
+            <div class="input">
+                <label>Throw Count</label>
+                <input type="number" value.bind="settings.throwCount | integer" />
             </div>
 
-            <div class="config-section" style="text-align: center;">
-                <button class="btn-main" click.delegate="saveSettings()">Apply & Generate</button>
+            <div class="input">
+                <label>Time Limit</label>
+                <input type="number" value.bind="settings.timeLimit | integer" />
             </div>
+
+            <div class="input">
+                <label>Display Time Limit</label>
+                <input type="checkbox" checked.bind="settings.displayTimeLimit" />
+            </div>
+
+            <div class="input">
+                <label>Time Limit Label</label>
+                <input type="text" value.bind="settings.timeLimitText" />
+            </div>
+
+            <div class="input">
+                <label>Ball Speed</label>
+                <input type="number" value.bind="settings.ballSpeed | integer" />
+            </div>
+
+            <div class="input">
+                <label>Ball Tint Color</label>
+                <input type="color" value.bind="settings.ballTint" />
+            </div>
+
+            <div class="input">
+                <label>Portrait Height</label>
+                <input type="number" value.bind="settings.portraitHeight | integer" />
+            </div>
+
+            <div class="input">
+                <label>Use Schedule</label>
+                <input type="checkbox" checked.bind="settings.useSchedule" />
+            </div>
+
+            <div class="input" if.bind="settings.useSchedule">
+                <label>Schedule</label>
+                <textarea value.bind="settings.schedule | integerArray & updateTrigger:'blur'"></textarea>
+            </div>
+
+            <div class="input">
+                <label>Schedule Honors Throw Count</label>
+                <input type="checkbox" checked.bind="settings.scheduleHonorsThrowCount" />
+            </div>
+
+            <div class="input">
+                <label>Game Over Text</label>
+                <input type="text" value.bind="settings.gameOverText" />
+            </div>
+
+            <div class="input">
+                <label>Game Over Opacity</label>
+                <input type="number" min="0" max="1" step="0.1" value.bind="settings.gameOverOpacity | number" />
+            </div>
+
+            <h2>Misc</h2>
+
+            <div class="input">
+                <label>Use CORS Proxy</label>
+                <input type="checkbox" checked.bind="settings.useCorsProxy" />
+            </div>
+
+            <button click.delegate="saveSettings()">Save</button>
         </div>
 
-        <div style="flex: 1 1 350px; position: sticky; top: 20px;">
-            <h3>JSON Config Preview</h3>
+        <div style="overflow-y: auto;">
             <pre>${settings | json & signal: 'save-settings'}</pre>
         </div>
     </div>
 
-    <hr style="margin: 40px 0; border: none; border-top: 1px solid #333;" />
-
-    <div style="padding-bottom: 150px;">
-        <h2>Deployment Code</h2>
-        <div class="config-section">
-            <pre id="code" style="color: #61afef;">&lt;iframe width="100%" height="600" src="${url}"&gt;&lt;/iframe&gt;</pre>
-            <div style="margin-top: 15px;">
-                <button id="copy" data-clipboard-target="#code">📋 Copy Code</button>
-                <button click.delegate="testGame()" style="background: #28a745; color: white; border: none;">🚀 Test Link</button>
-            </div>
-        </div>
+    <div>
+        <h1>
+            Code
+            <button id="copy" data-clipboard-target="#code">&#10697; Copy</button>
+            <button click.delegate="testGame()">&#129514; Test</button>
+        </h1>
+        <pre id="code">&lt;iframe id="cyberball" width="100%" height="580" src="${url}"&gt;&lt;/iframe&gt;</pre>
     </div>
 </template>
