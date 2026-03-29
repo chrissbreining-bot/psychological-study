@@ -6,7 +6,6 @@
     <require from="resources/value-converters/flag-value-converter"></require>
 
     <style>
-        /* 1. 全局样式与滚动锁定解除 */
         body {
             background: #111;
             color: #eee;
@@ -17,7 +16,6 @@
             padding: 20px;
         }
 
-        /* 2. 输入项布局 */
         .input {
             display: flex;
             margin-bottom: 8px;
@@ -52,7 +50,6 @@
             gap: 5px;
         }
 
-        /* 3. 配置块容器 */
         .config-section {
             border: 1px solid #333;
             padding: 20px;
@@ -74,14 +71,12 @@
             background: #000;
             padding: 15px;
             border: 1px solid #333;
-            color: #00ff00; /* 类似终端的绿色预览 */
+            color: #00ff00;
             font-size: 0.85em;
         }
 
         h1, h2 { border-bottom: 1px solid #333; padding-bottom: 10px; }
         button { cursor: pointer; padding: 6px 12px; transition: 0.2s; }
-        button:hover { background: #444; color: #fff; }
-
         .btn-main {
             background: #0078d4;
             color: white;
@@ -123,8 +118,8 @@
             <div style="display: flex; align-items: center; justify-content: space-between;">
                 <h2>Computer Players (CPUs)</h2>
                 <div>
-                    <button click.delegate="addCPU()" title="增加一个CPU">+ Add CPU</button>
-                    <button click.delegate="removeCPU()" title="移除最后一个CPU">- Remove</button>
+                    <button click.delegate="addCPU()">+ Add CPU</button>
+                    <button click.delegate="removeCPU()">- Remove</button>
                 </div>
             </div>
 
@@ -159,29 +154,37 @@
                 </div>
 
                 <div class="column" if.bind="cpu.leaveTrigger | flag:cpu.leaveTrigger:1" style="margin-top: 10px; padding: 10px; background: #222; border-radius: 4px;">
-                    <label style="font-size: 0.85em; color: #aaa;">Throws Configuration: Threshold / Variance / Chance%</label>
+                    <label style="font-size: 0.85em; color: #aaa;">Throws Configuration</label>
                     <div style="display: flex; gap: 8px;">
-                        <input type="number" value.bind="cpu.leaveTurn | integer" title="投球次数阈值" />
-                        <input type="number" value.bind="cpu.leaveTurnVariance | integer" title="随机偏差值" />
-                        <input type="number" value.bind="cpu.leaveTurnChance | integer" title="触发概率 (0-100)" />
+                        <input type="number" value.bind="cpu.leaveTurn | integer" title="Threshold" />
+                        <input type="number" value.bind="cpu.leaveTurnVariance | integer" title="Variance" />
+                        <input type="number" value.bind="cpu.leaveTurnChance | integer" title="Chance%" />
                     </div>
                 </div>
 
-                <div class="input" style="margin-top: 10px;">
-                    <label>Throw Delay (ms)</label>
-                    <input type="number" value.bind="cpu.throwDelay | integer" />
+                <div style="margin: 15px 0 5px 0; font-weight: bold; font-size: 0.9em; color: #aaa;">Timing & Delays (ms)</div>
+                <div class="input">
+                    <label>Catch Delay / Variance</label>
+                    <div style="display: flex; gap: 5px;">
+                        <input type="number" value.bind="cpu.catchDelay | integer" />
+                        <input type="number" value.bind="cpu.catchDelayVariance | integer" />
+                    </div>
                 </div>
-            </div>
-
-            <div class="config-section" style="text-align: center;">
+                <div class="input">
+                    <label>Throw Delay / Variance</label>
+                    <div style="display: flex; gap: 5px;">
+                        <input type="number" value.bind="cpu.throwDelay | integer" />
+                        <input type="number" value.bind="cpu.throwDelayVariance | integer" />
+                    </div>
+                </div>
+            </div> <div class="config-section" style="text-align: center;">
                 <h2>Gameplay & Finalize</h2>
                 <button class="btn-main" click.delegate="saveSettings()">Apply & Refresh Preview</button>
             </div>
         </div>
 
         <div style="flex: 1 1 350px; position: sticky; top: 20px;">
-            <h3 style="margin-top: 0;">JSON Config Preview</h3>
-            <p style="font-size: 0.8em; color: #888;">(此配置将编码进 URL 链接中)</p>
+            <h3>JSON Config Preview</h3>
             <pre>${settings | json & signal: 'save-settings'}</pre>
         </div>
     </div>
@@ -191,12 +194,10 @@
     <div style="padding-bottom: 150px;">
         <h1>Deployment Code</h1>
         <div style="background: #1a1a1a; padding: 20px; border-radius: 8px;">
-            <p>使用以下 iframe 代码嵌入到你的调查问卷（如 WJX 或 Qualtrics）：</p>
             <pre id="code" style="color: #61afef;">&lt;iframe id="cyberball" width="100%" height="600" src="${url}"&gt;&lt;/iframe&gt;</pre>
-            
             <div style="margin-top: 20px; display: flex; gap: 15px;">
-                <button id="copy" data-clipboard-target="#code" style="padding: 10px 20px;">📋 Copy Code</button>
-                <button click.delegate="testGame()" style="padding: 10px 20px; background: #28a745; color: white; border: none;">🚀 Test Link in New Tab</button>
+                <button id="copy" data-clipboard-target="#code"> Copy Code</button>
+                <button click.delegate="testGame()" style="background: #28a745; color: white; border: none;"> Test Link</button>
             </div>
         </div>
     </div>
