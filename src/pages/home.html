@@ -6,7 +6,7 @@
     <require from="resources/value-converters/flag-value-converter"></require>
 
     <style>
-        /* 1. 强制 body 允许滚动，并清除可能的锁定 */
+        /* 1. 全局样式与滚动锁定解除 */
         body {
             background: #111;
             color: #eee;
@@ -17,108 +17,187 @@
             padding: 20px;
         }
 
+        /* 2. 输入项布局 */
         .input {
             display: flex;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            align-items: center;
         }
 
         .input label {
             width: 180px;
+            font-size: 0.9em;
+            color: #ccc;
         }
 
         .input label + * {
             box-sizing: border-box;
-            max-width: 300px;
+            max-width: 350px;
         }
 
-        .input input[type=text], .input input[type=number], textarea {
+        .input input[type=text], 
+        .input input[type=number], 
+        textarea {
             flex: 1 1 100%;
             min-width: 0;
-            width: auto;
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 5px;
         }
 
         .column {
             display: flex;
             flex-direction: column;
+            gap: 5px;
         }
 
-        .input > div {
+        /* 3. 配置块容器 */
+        .config-section {
+            border: 1px solid #333;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            background: #1a1a1a;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .main-flex-container {
             display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
         }
 
         pre {
             max-width: 100%;
             overflow-x: auto;
             background: #000;
-            padding: 10px;
+            padding: 15px;
+            border: 1px solid #333;
+            color: #00ff00; /* 类似终端的绿色预览 */
+            font-size: 0.85em;
         }
 
-        /* 2. 这里的辅助类确保容器不会锁死高度 */
-        .main-flex-container {
-            display: flex;
-            flex-wrap: wrap; /* 屏幕不够宽时自动换行，防止卡死 */
-            align-items: flex-start;
+        h1, h2 { border-bottom: 1px solid #333; padding-bottom: 10px; }
+        button { cursor: pointer; padding: 6px 12px; transition: 0.2s; }
+        button:hover { background: #444; color: #fff; }
+
+        .btn-main {
+            background: #0078d4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
         }
     </style>
 
     <div class="main-flex-container">
-        <div style="margin-right: 20px; flex: 1 1 600px;">
+        <div style="margin-right: 30px; flex: 1 1 650px;">
             <h1>Cyberball Configuration Builder</h1>
 
-            <h2>Player</h2>
+            <div class="config-section">
+                <h2 style="margin-top:0;">Player (You)</h2>
+                <div class="input">
+                    <label>Name</label>
+                    <input type="text" value.bind="settings.player.name" />
+                </div>
+                <div class="input">
+                    <label>Tint Color</label>
+                    <input type="color" value.bind="settings.player.tint" />
+                </div>
+                <div class="input">
+                    <label>Portrait URL</label>
+                    <input type="text" value.bind="settings.player.portrait" />
+                </div>
 
-            <div class="input">
-                <label>Name</label>
-                <input type="text" value.bind="settings.player.name" />
+                <div style="margin: 15px 0 5px 0; font-weight: bold;">Leave Triggers (Player)</div>
+                <div class="column">
+                    <label><input type="checkbox" checked.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:1" /> Throws Elapsed</label>
+                    <label><input type="checkbox" checked.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:2" /> Time Elapsed</label>
+                    <label><input type="checkbox" checked.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:4" /> Throws Ignored</label>
+                    <label><input type="checkbox" checked.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:16" /> Time Ignored</label>
+                    <label><input type="checkbox" checked.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:8" /> Others Leaving</label>
+                </div>
             </div>
 
-            <div class="input">
-                <label>Tint Color</label>
-                <input type="color" value.bind="settings.player.tint" />
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <h2>Computer Players (CPUs)</h2>
+                <div>
+                    <button click.delegate="addCPU()" title="增加一个CPU">+ Add CPU</button>
+                    <button click.delegate="removeCPU()" title="移除最后一个CPU">- Remove</button>
+                </div>
             </div>
 
-            <div class="input">
-                <label>Portrait</label>
-                <input type="text" value.bind="settings.player.portrait" />
+            <div repeat.for="cpu of settings.computerPlayers" class="config-section" style="border-left: 4px solid #0078d4;">
+                <h3 style="margin-top:0; color: #0078d4;">CPU #${$index + 1}: ${cpu.name}</h3>
+                
+                <div class="input">
+                    <label>Name</label>
+                    <input type="text" value.bind="cpu.name" />
+                </div>
+
+                <div class="input">
+                    <label>Tint Color</label>
+                    <input type="color" value.bind="cpu.tint" />
+                </div>
+
+                <div class="input">
+                    <label title="0: 传给玩家, 1+: 传给其他CPU">Target Preference (Weights)</label>
+                    <div style="display: flex; gap: 5px;">
+                        <input repeat.for="target of cpu.targetPreference" 
+                               type="number" 
+                               style="width: 55px;" 
+                               value.bind="cpu.targetPreference[$index] | integer" 
+                               placeholder="To P${$index}" />
+                    </div>
+                </div>
+
+                <div style="margin: 15px 0 5px 0; font-weight: bold;">Leave Triggers (CPU)</div>
+                <div class="column">
+                    <label><input type="checkbox" checked.bind="cpu.leaveTrigger | flag:cpu.leaveTrigger:1" /> Throws Elapsed</label>
+                    <label><input type="checkbox" checked.bind="cpu.leaveTrigger | flag:cpu.leaveTrigger:4" /> Throws Ignored</label>
+                </div>
+
+                <div class="column" if.bind="cpu.leaveTrigger | flag:cpu.leaveTrigger:1" style="margin-top: 10px; padding: 10px; background: #222; border-radius: 4px;">
+                    <label style="font-size: 0.85em; color: #aaa;">Throws Configuration: Threshold / Variance / Chance%</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="number" value.bind="cpu.leaveTurn | integer" title="投球次数阈值" />
+                        <input type="number" value.bind="cpu.leaveTurnVariance | integer" title="随机偏差值" />
+                        <input type="number" value.bind="cpu.leaveTurnChance | integer" title="触发概率 (0-100)" />
+                    </div>
+                </div>
+
+                <div class="input" style="margin-top: 10px;">
+                    <label>Throw Delay (ms)</label>
+                    <input type="number" value.bind="cpu.throwDelay | integer" />
+                </div>
             </div>
 
-            <div style="margin-top: 10px; font-weight: bold;">Leave Triggers</div>
-            <div class="column">
-                <label>
-                    <input type="checkbox" checked.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:1" /> Throws Elapsed
-                </label>
-                <label>
-                    <input type="checkbox" checked.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:2" /> Time Elapsed
-                </label>
-                <label>
-                    <input type="checkbox" checked.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:4" /> Throws Ignored
-                </label>
-                <label>
-                    <input type="checkbox" checked.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:16" /> Time Ignored
-                </label>
-                <label>
-                    <input type="checkbox" checked.bind="settings.player.leaveTrigger | flag:settings.player.leaveTrigger:8" /> Other Players Leaving
-                </label>
+            <div class="config-section" style="text-align: center;">
+                <h2>Gameplay & Finalize</h2>
+                <button class="btn-main" click.delegate="saveSettings()">Apply & Refresh Preview</button>
             </div>
-
-            <h2>Gameplay</h2>
-            <button click.delegate="saveSettings()" style="padding: 10px 20px; margin-top: 20px;">Save Configuration</button>
         </div>
 
-        <div style="flex: 1 1 300px; max-width: 100%;">
-            <h3>JSON Preview</h3>
+        <div style="flex: 1 1 350px; position: sticky; top: 20px;">
+            <h3 style="margin-top: 0;">JSON Config Preview</h3>
+            <p style="font-size: 0.8em; color: #888;">(此配置将编码进 URL 链接中)</p>
             <pre>${settings | json & signal: 'save-settings'}</pre>
         </div>
     </div>
 
-    <hr style="margin: 40px 0;" />
+    <hr style="margin: 50px 0; border: none; border-top: 1px solid #333;" />
 
-    <div style="padding-bottom: 100px;">
-        <h1>
-            Code
-            <button id="copy" data-clipboard-target="#code">&#10697; Copy</button>
-            <button click.delegate="testGame()">&#129514; Test</button>
-        </h1>
-        <pre id="code">&lt;iframe id="cyberball" width="100%" height="580" src="${url}"&gt;&lt;/iframe&gt;</pre>
+    <div style="padding-bottom: 150px;">
+        <h1>Deployment Code</h1>
+        <div style="background: #1a1a1a; padding: 20px; border-radius: 8px;">
+            <p>使用以下 iframe 代码嵌入到你的调查问卷（如 WJX 或 Qualtrics）：</p>
+            <pre id="code" style="color: #61afef;">&lt;iframe id="cyberball" width="100%" height="600" src="${url}"&gt;&lt;/iframe&gt;</pre>
+            
+            <div style="margin-top: 20px; display: flex; gap: 15px;">
+                <button id="copy" data-clipboard-target="#code" style="padding: 10px 20px;">📋 Copy Code</button>
+                <button click.delegate="testGame()" style="padding: 10px 20px; background: #28a745; color: white; border: none;">🚀 Test Link in New Tab</button>
+            </div>
+        </div>
     </div>
 </template>
