@@ -34,17 +34,18 @@ export class GameViewModel {
     }
 
     bind() {
-        this.gameConfig  = {
-            type: Phaser.AUTO,
-            width: this.gameWidth,
-            height: this.gameHeight,
-            scene: new CyberballScene(this.settings),
-            physics: {
-                default: 'arcade'
-            }
-        };
-    }
-
+        this.gameConfig = {
+    type: Phaser.AUTO,
+    backgroundColor: '#2c3e50', // 1. 引擎背景色
+    scale: {
+        mode: Phaser.Scale.FIT, // 2. 自动缩放填充
+        autoCenter: Phaser.Scale.CENTER_BOTH, // 3. 居中
+        width: 800, 
+        height: 600,
+        orientation: Phaser.Scale.LANDSCAPE // 4. 锁定横屏方向
+    },
+    // ... 其他配置
+};
     // Chat:
 
     chatMessage: string;
