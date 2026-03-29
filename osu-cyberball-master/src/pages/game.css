@@ -1,0 +1,20 @@
+/* 修改类名以符合用途 */
+.game-full-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    background-color: #2c3e50; /* 游戏背景色，可改为 #ffffff */
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* 针对 Phaser 渲染出的 canvas 进行强制适配 */
+canvas {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* 保持比例缩放 */
+}
