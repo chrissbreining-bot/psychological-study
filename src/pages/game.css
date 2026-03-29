@@ -1,19 +1,22 @@
-/* 不要在这里写 html, body 的背景色和 overflow */
+/* 移除所有对 html 和 body 的直接设置 */
 
-/* 1. 针对游戏界面的特定容器 */
 .game-active-layout {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: #2c3e50 !important; /* 只有这里变深蓝 */
-    z-index: 9999; /* 确保盖住其他内容 */
+    background-color: #2c3e50 !important; /* 强制背景色 */
+    z-index: 9999;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden !important; /* 只有这里禁止滚动 */
+    overflow: hidden !important; /* 禁止游戏时滚动 */
 }
 
-/* 2. 确保配置页（Home）不受影响 */
-/* 如果配置页还是蓝色，请在 home.html 的对应容器加上 background: white */
+/* 针对游戏画布的自适应 */
+canvas {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
